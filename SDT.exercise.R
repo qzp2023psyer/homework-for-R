@@ -1,7 +1,28 @@
+setwd("C:/Users/Cesare/Desktop/R4psybook/R4Psy")
 library(tidyverse)
-
 # 获取所有的.out文件名
 files <- list.files("data/match", pattern = "data_exp7_rep_match_.*\\.out$", full.names = TRUE)
+
+convert_data_types = function(df) {
+  df <- df %>%
+    dplyr::mutate(Date = as.character(Date),
+                  Prac = as.character(Prac),
+                  Sub = as.numeric(Sub),
+                  Age = as.numeric(Age),
+                  Sex = as.character(Sex),
+                  Hand = as.character(Hand),
+                  Block = as.numeric(Block),
+                  Bin = as.numeric(Bin),
+                  Trial = as.numeric(Trial),
+                  Shape = as.character(Shape),
+                  Label = as.character(Label),
+                  Match = as.character(Match),
+                  CorrResp = as.character(CorrResp),
+                  Resp = as.character(Resp),
+                  ACC = as.numeric(ACC),
+                  RT = as.numeric(RT))
+  return(df)
+}
 
 # 读取每个.out文件，并进行数据清洗
 matching.data <- lapply(files, function(file) {
@@ -40,9 +61,9 @@ matching.result <- matching.data %>%
              fa / (fa + cr),
              1 / (2 * (fa + cr))
       )
-    ), .groups = 'drop') %>%
-  group_by(Sub,Shape)%>%
-  summarise(Dprime = mean(Dprime), .groups = 'drop')%>%
-  
+    )) %>%
+  select(-hit, -fa, -miss, -cr)%>%
   pivot_wider(names_from = "Shape", 
               values_from = "Dprime")
+
+
